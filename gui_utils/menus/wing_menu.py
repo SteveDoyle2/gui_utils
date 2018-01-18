@@ -12,7 +12,11 @@ from qtpy.QtWidgets import (
     QButtonGroup, QGridLayout, QHBoxLayout, QVBoxLayout, QSlider, QCheckBox,
     QSpinBox, QGroupBox, QTabWidget)
 
-from pyNastran.gui.gui_interface.common import PyDialog, QPushButtonColor
+try:
+    from pyNastran.gui.gui_interface.common import PyDialog, QPushButtonColor, QJumpSlider
+except:
+    from common import PyDialog, QPushButtonColor, QJumpSlider
+
 from pyNastran.gui.qt_version import qt_version
 
 
@@ -77,7 +81,7 @@ class WingWindow(PyDialog):
         self.name_edit = QLineEdit(str(self._default_name))
 
         self.colormap = QLabel("Color:")
-        self.colormap_edit = QPushButtonColor(self._color_int)
+        self.colormap_edit = QPushButtonColor(self._color_int, 'Select a color', parent=self)
         self.colormap_button = QPushButton("Advanced")
 
         # --------------------------------------------------------------
@@ -88,14 +92,15 @@ class WingWindow(PyDialog):
         num_u = 5
         num_w = 10
         self.tesselation_u = QLabel("Num_U")
-        self.tesselation_u_edit = QSlider(QtCore.Qt.Horizontal)
+        self.tesselation_u_edit = QJumpSlider(QtCore.Qt.Horizontal)
         self.tesselation_u_edit.setTickPosition(QSlider.TicksBelow)
         self.tesselation_u_edit.setRange(1, 10)
         self.tesselation_u_edit.setValue(num_u)
         self.tesselation_u_button = QLineEdit('')
+        self.tesselation_u_edit.set_forward_connection(self.tesselation_u_button)
 
         self.tesselation_w = QLabel("Num_W")
-        self.tesselation_w_edit = QSlider(QtCore.Qt.Horizontal)
+        self.tesselation_w_edit = QJumpSlider(QtCore.Qt.Horizontal)
         self.tesselation_w_edit.setTickPosition(QSlider.TicksBelow)
         self.tesselation_w_edit.setRange(1, 10)
         self.tesselation_w_edit.setValue(num_w)
@@ -109,7 +114,14 @@ class WingWindow(PyDialog):
 
         priority = 3
         priority_max = 50
-        self.priority = QLabel("Priority")
+        self.priority = QLabel('Priority')
+        msg = (
+            'Components compete for volume during the mass properties.\n'
+            'A lower priority (e.g., 0) takes precendence.  Additionally, \n'
+            'when combined with a density of 0.0, this can be used to \n'
+            'create voids (empty regions).'
+        )
+        self.priority.setToolTip(msg)
         self.priority_edit = QSpinBox(self)
         self.priority_edit.setRange(0, priority_max)
         self.priority_edit.setSingleStep(1)
@@ -153,49 +165,49 @@ class WingWindow(PyDialog):
         rot_origin_angle = 0.0
 
         self.xloc = QLabel("X Loc")
-        self.xloc_edit = QSlider(QtCore.Qt.Horizontal)
+        self.xloc_edit = QJumpSlider(QtCore.Qt.Horizontal)
         #self.xloc_edit.setTickPosition(QSlider.TicksBelow)
         self.xloc_edit.setRange(1, 10)
         self.xloc_edit.setValue(xloc)
         self.xloc_button = QLineEdit(str(xloc))
 
         self.yloc = QLabel("Y Loc")
-        self.yloc_edit = QSlider(QtCore.Qt.Horizontal)
+        self.yloc_edit = QJumpSlider(QtCore.Qt.Horizontal)
         #self.yloc_edit.setTickPosition(QSlider.TicksBelow)
         self.yloc_edit.setRange(1, 10)
         self.yloc_edit.setValue(yloc)
         self.yloc_button = QLineEdit(str(yloc))
 
         self.zloc = QLabel("Z Loc")
-        self.zloc_edit = QSlider(QtCore.Qt.Horizontal)
+        self.zloc_edit = QJumpSlider(QtCore.Qt.Horizontal)
         #self.zloc_edit.setTickPosition(QSlider.TicksBelow)
         self.zloc_edit.setRange(1, 10)
         self.zloc_edit.setValue(zloc)
         self.zloc_button = QLineEdit(str(zloc))
 
         self.xrot = QLabel("X Rot")
-        self.xrot_edit = QSlider(QtCore.Qt.Horizontal)
+        self.xrot_edit = QJumpSlider(QtCore.Qt.Horizontal)
         #self.xrot_edit.setTickPosition(QSlider.TicksBelow)
         self.xrot_edit.setRange(1, 10)
         self.xrot_edit.setValue(xrot)
         self.xrot_button = QLineEdit(str(xrot))
 
         self.yrot = QLabel("Y Rot")
-        self.yrot_edit = QSlider(QtCore.Qt.Horizontal)
+        self.yrot_edit = QJumpSlider(QtCore.Qt.Horizontal)
         #self.yrot_edit.setTickPosition(QSlider.TicksBelow)
         self.yrot_edit.setRange(1, 10)
         self.yrot_edit.setValue(yrot)
         self.yrot_button = QLineEdit(str(yrot))
 
         self.zrot = QLabel("Z Rot")
-        self.zrot_edit = QSlider(QtCore.Qt.Horizontal)
+        self.zrot_edit = QJumpSlider(QtCore.Qt.Horizontal)
         #self.zrot_edit.setTickPosition(QSlider.TicksBelow)
         self.zrot_edit.setRange(1, 10)
         self.zrot_edit.setValue(zrot)
         self.zrot_button = QLineEdit(str(zrot))
 
         self.rot_origin = QLabel("Rot Origin (X)")
-        self.rot_origin_edit = QSlider(QtCore.Qt.Horizontal)
+        self.rot_origin_edit = QJumpSlider(QtCore.Qt.Horizontal)
         #self.rot_origin_edit.setTickPosition(QSlider.TicksBelow)
         self.rot_origin_edit.setRange(1, 10)
         self.rot_origin_edit.setValue(rot_origin_angle)
@@ -332,7 +344,7 @@ class WingWindow(PyDialog):
         #--------------------------------------------------------
         scale = 1.1
         self.scale = QLabel('Scale')
-        self.scale_edit = QSlider(QtCore.Qt.Horizontal)
+        self.scale_edit = QJumpSlider(QtCore.Qt.Horizontal)
         self.scale_button = QLineEdit(str(scale))
         self.reset_button = QPushButton('Reset')
         self.accept_button = QPushButton('Accept')
@@ -352,11 +364,11 @@ class WingWindow(PyDialog):
         uvalue = 0.5
         wvalue = 0.6
         uname = QLabel('U:')
-        uedit = QSlider(QtCore.Qt.Horizontal)
+        uedit = QJumpSlider(QtCore.Qt.Horizontal)
         ubutton = QLineEdit(str(uvalue))
 
         wname = QLabel('W:')
-        wedit = QSlider(QtCore.Qt.Horizontal)
+        wedit = QJumpSlider(QtCore.Qt.Horizontal)
         wbutton = QLineEdit(str(wvalue))
 
         self.translate_none = QCheckBox('None')
