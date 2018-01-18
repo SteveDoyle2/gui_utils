@@ -72,6 +72,8 @@ from pyNastran.gui.styles.rotation_center_style import RotationCenterStyle
 #from pyNastran.gui.menus.multidialog import MultiFileDialog
 from pyNastran.gui.gui_utils.utils import load_csv, load_deflection_csv, load_user_geom
 
+#---------------------------------
+from gui_utils.menus.wing_menu import WingWindow
 
 class Interactor(vtk.vtkGenericRenderWindowInteractor):
     def __init__(self):
@@ -476,6 +478,7 @@ class GuiCommon2(QMainWindow, GuiCommon):
                 ('about', 'About pyNastran GUI...', 'tabout.png', 'CTRL+H', 'About pyNastran GUI and help on shortcuts', self.about_dialog),
                 ('view', 'Camera View', 'view.png', None, 'Load the camera menu', self.view_camera),
                 ('camera_reset', 'Reset Camera View', 'trefresh.png', 'r', 'Reset the camera view to default', self.on_reset_camera),
+                ('wing_menu', 'Load the Wing...', 'wing.png', None, 'Load the Wing Menu', self.on_wing_window),
                 #('reload', 'Reload Model...', 'treload.png', 'r', 'Remove the model and reload the same geometry file', self.on_reload),
 
                 #('cycle_results', 'Cycle Results', 'cycle_results.png', 'CTRL+L', 'Changes the result case', self.on_cycle_results),
@@ -627,6 +630,7 @@ class GuiCommon2(QMainWindow, GuiCommon):
             #'load_custom_result', '',
             'load_csv_user_points', 'load_csv_user_geom', 'script', '', 'exit']
         toolbar_tools = [
+            'wing_menu',
             #'reload',
             #'load_geometry', 'load_results',
             'front_view', 'back_view', 'top_view', 'bottom_view', 'left_view', 'right_view',
@@ -5415,6 +5419,58 @@ class GuiCommon2(QMainWindow, GuiCommon):
         self.log_command(msg)
         #if is_shown:
             #pass
+
+    #---------------------------------------------------------------------------------------
+    # WingWindow
+    def on_wing_window(self):
+        if not hasattr(self, '_edit_geometry_window_shown'):
+            self._edit_geometry_window_shown = False
+        #data = deepcopy(self.geometry_properties)
+
+        transform = {
+            'xyz' : [0., 0., 0.],
+            'is_absolute' : False,
+            'rot origin(X)' : 0.,
+        }
+        symmetry = {}
+        data = {
+            'name' : 'WingGeom',
+            'color' : (0, 0, 255),
+            #'font_size' : 8,
+            'num_U' : 16,
+            'num_W' : 33,
+            'Density' : 1.0,
+            'Thin Shell' : False,
+            'Mass/Area' : 1.0,
+            #'Priority' : 0,
+            'Negative Volume' : False,
+
+            'transform' : transform,
+            'symmetry' : symmetry,
+        }
+        data['font_size'] = self.font_size
+        if not self._edit_geometry_window_shown:
+            self._edit_geometry = WingWindow(data, win_parent=self)
+            self._edit_geometry.show()
+            self._edit_geometry_window_shown = True
+            self._edit_geometry.exec_()
+        else:
+            self._edit_geometry.activateWindow()
+
+        if 'clicked_ok' not in data:
+            self._edit_geometry.activateWindow()
+            return
+
+        if data['clicked_ok']:
+            self.on_update_geometry_properties(data)
+            self._save_geometry_properties(data)
+            del self._edit_geometry
+            self._edit_geometry_window_shown = False
+        elif data['clicked_cancel']:
+            #self.on_update_geometry_properties(self.geometry_properties)
+            del self._edit_geometry
+            self._edit_geometry_window_shown = False
+
     #---------------------------------------------------------------------------------------
     # EDIT ACTOR PROPERTIES
     def edit_geometry_properties(self):

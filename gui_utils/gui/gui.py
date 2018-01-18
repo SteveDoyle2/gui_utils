@@ -18,8 +18,8 @@ from pyNastran.gui.arg_handling import get_inputs
 get_inputs()
 
 
-import pyNastran as gui_utils
-from main_window import MainWindow
+import gui_utils
+from gui_utils.gui.main_window import MainWindow
 
 
 def cmd_line():

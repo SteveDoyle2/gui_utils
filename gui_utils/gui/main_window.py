@@ -23,6 +23,7 @@ from qtpy.QtWidgets import QMessageBox, qApp
 # 3rd party
 import vtk
 
+import gui_utils
 import pyNastran
 #from pyNastran.gui.gui_utils.utils import check_for_newer_version
 
@@ -32,7 +33,8 @@ import pyNastran
 from pyNastran.gui.formats import (
     Cart3dIO, STL_IO,
 )
-from gui_common import GuiCommon2
+from gui_utils.gui.gui_common import GuiCommon2
+from gui_utils.menus.wing_menu import WingWindow
 
 try:
     pkg_path = sys._MEIPASS #@UndefinedVariable
@@ -124,23 +126,23 @@ class MainWindow(GuiCommon2, Cart3dIO, STL_IO,):
 
     def about_dialog(self):
         """ Display about dialog """
-        copyright = pyNastran.__copyright__
+        copyright = gui_utils.__copyright__
         if qt_version == 'pyside':
             word = 'PySide'
-            copyright_qt = pyNastran.__pyside_copyright__
+            copyright_qt = gui_utils.__pyside_copyright__
         else:
             word = 'PyQt'
-            copyright_qt = pyNastran.__pyqt_copyright__
+            copyright_qt = gui_utils.__pyqt_copyright__
 
         about = [
             'pyNastran %s GUI' % word,
             '',
-            'pyNastran v%s' % pyNastran.__version__,
+            'pyNastran v%s' % gui_utils.__version__,
             copyright,
             copyright_qt,
-            pyNastran.__author__,
+            gui_utils.__author__,
             '',
-            '%s' % pyNastran.__website__,
+            '%s' % gui_utils.__website__,
             '',
             'Mouse',
             'Left Click - Rotate',

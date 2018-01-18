@@ -66,7 +66,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'mygui = gui_utils.gui.:cmd_line',
+            'mygui = gui_utils.gui.gui:cmd_line',
         ]
     },
     test_suite='pyNastran.all_tests',
