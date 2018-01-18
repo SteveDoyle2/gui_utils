@@ -59,7 +59,7 @@ from pyNastran.gui.gui_interface.groups_modify.interface import on_set_modify_gr
 from pyNastran.gui.gui_interface.groups_modify.groups_modify import Group
 
 
-from pyNastran.gui.menus.results_sidebar import Sidebar
+from gui_utils.menus.add_sidebar import Sidebar
 from pyNastran.gui.menus.application_log import PythonConsoleWidget, ApplicationLogWidget
 from pyNastran.gui.menus.manage_actors import EditGeometryProperties
 
@@ -74,6 +74,8 @@ from pyNastran.gui.gui_utils.utils import load_csv, load_deflection_csv, load_us
 
 #---------------------------------
 from gui_utils.menus.wing_menu import WingWindow
+import gui_utils.vsp_g as vsp
+
 
 class Interactor(vtk.vtkGenericRenderWindowInteractor):
     def __init__(self):
@@ -130,6 +132,8 @@ class GuiCommon2(QMainWindow, GuiCommon):
 
         fmt_order = kwds['fmt_order']
         inputs = kwds['inputs']
+        self.stdout = vsp.cvar.cstdout
+        self.errorMgr = vsp.ErrorMgrSingleton_getInstance()
 
         #self.app = inputs['app']
         #del inputs['app']
@@ -5422,6 +5426,10 @@ class GuiCommon2(QMainWindow, GuiCommon):
 
     #---------------------------------------------------------------------------------------
     # WingWindow
+    def on_add_menu(self, text):
+        self.log_info('on_add_menu(text=%r)' % text)
+        self.on_wing_window()
+
     def on_wing_window(self):
         if not hasattr(self, '_edit_geometry_window_shown'):
             self._edit_geometry_window_shown = False
@@ -5462,8 +5470,8 @@ class GuiCommon2(QMainWindow, GuiCommon):
             return
 
         if data['clicked_ok']:
-            self.on_update_geometry_properties(data)
-            self._save_geometry_properties(data)
+            #self.on_update_geometry_properties(data)
+            #self._save_geometry_properties(data)
             del self._edit_geometry
             self._edit_geometry_window_shown = False
         elif data['clicked_cancel']:

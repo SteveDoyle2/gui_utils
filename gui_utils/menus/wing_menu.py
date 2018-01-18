@@ -83,6 +83,7 @@ class WingWindow(PyDialog):
         self.colormap = QLabel("Color:")
         self.colormap_edit = QPushButtonColor(self._color_int, 'Select a color', parent=self)
         self.colormap_button = QPushButton("Advanced")
+        self.colormap_button.setEnabled(False)
 
         # --------------------------------------------------------------
         # TODO: the way these sliders work is they have some defined range
