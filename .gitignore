@@ -1,0 +1,100 @@
+# HTML Junk
+*.html
+*.doctree
+*inheritance*
+*_build*
+*.js
+*.css
+*.json
+*.htm
+htmlcov
+
+# Other
+*.pyc
+*.pyd
+*.whl
+*.dll
+*.log
+*.rar
+*.out
+*.log
+*.tar.gz 
+*.zip
+*.csv
+*.pdf
+*.h5
+*.gz
+
+# C extensions
+*.so
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+__pycache__
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+# WingIDE
+*.wpr
+*.wpu
+
+# Nastran
+*test_bdf.dat
+*test_bdf.bdf
+*test_op2.bdf
+*test_op2.f06
+*test_op2.op2
+*test_f06.f06
+*test_f06.op2
+*.bdf_out
+*.dat_out
+*.f04
+*.plt
+*.ses.*
+*.jou
+*.log.*
+*.op2.*
+*.f06.*
+*.err
+*.rej
+*.db
+
+# VTK
+*.vtu
+
+# Tecplot
+*.plt
+*.mcr
+
+# GMesh
+*.bb
+*.mesh
+*.gis
+*.medit
+
+# packages
+*structMan*
+*CoFE*
+
