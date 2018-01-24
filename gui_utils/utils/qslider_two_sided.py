@@ -1,9 +1,6 @@
-# kills the program when you hit Cntl+C from the command line
-import signal
-signal.signal(signal.SIGINT, signal.SIG_DFL)
+from __future__ import print_function
 
 
-#from PyQt4 import QtGui, QtCore, Qt
 from qtpy import QtCore
 from qtpy import QtGui
 from qtpy.QtCore import Qt
@@ -13,14 +10,15 @@ from qtpy.QtWidgets import (
     QComboBox, QLabel, QHBoxLayout, QMessageBox, QSlider, QStyle, QStyleOptionSlider)
 
 class RangeSlider(QSlider):
-    """ A slider for ranges.
+    """
+    A slider for ranges.
 
-        This class provides a dual-slider for ranges, where there is a defined
-        maximum and minimum, as is a normal slider, but instead of having a
-        single slider value, there are 2 slider values.
+    This class provides a dual-slider for ranges, where there is a defined
+    maximum and minimum, as is a normal slider, but instead of having a
+    single slider value, there are 2 slider values.
 
-        This class emits the same signals as the QSlider base class, with the
-        exception of valueChanged
+    This class emits the same signals as the QSlider base class, with the
+    exception of valueChanged
     """
     def __init__(self, *args):
         super(RangeSlider, self).__init__(*args)
@@ -63,7 +61,7 @@ class RangeSlider(QSlider):
             # Only draw the groove for the first slider so it doesn't get drawn
             # on top of the existing ones every time
             if i == 0:
-                opt.subControls = QStyle.SC_SliderHandle#QtGui.QStyle.SC_SliderGroove | QtGui.QStyle.SC_SliderHandle
+                opt.subControls = QStyle.SC_SliderHandle #QtGui.QStyle.SC_SliderGroove | QtGui.QStyle.SC_SliderHandle
             else:
                 opt.subControls = QStyle.SC_SliderHandle
 
@@ -185,10 +183,16 @@ class RangeSlider(QSlider):
                                              pos-slider_min, slider_max-slider_min,
                                              opt.upsideDown)
 
+
 if __name__ == "__main__":
     import sys
+
+    # kills the program when you hit Cntl+C from the command line
+    import signal
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+
     def echo(value):
-        print value
+        print(value)
     app = QApplication(sys.argv)
     slider = RangeSlider(Qt.Horizontal)
     slider.setMinimum(0)

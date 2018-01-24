@@ -12,10 +12,9 @@ from qtpy.QtWidgets import (
     QButtonGroup, QGridLayout, QHBoxLayout, QVBoxLayout, QSlider, QCheckBox,
     QSpinBox, QGroupBox, QTabWidget)
 
-try:
-    from pyNastran.gui.gui_interface.common import PyDialog, QPushButtonColor, QJumpSlider
-except:
-    from common import PyDialog, QPushButtonColor, QJumpSlider
+from gui_utils.menus.common import PyDialog
+from gui_utils.utils.qpush_button_color import QPushButtonColor
+from gui_utils.utils.qjump_slider import QJumpSlider
 
 from pyNastran.gui.qt_version import qt_version
 
@@ -98,7 +97,10 @@ class WingWindow(PyDialog):
         self.tesselation_u_edit.setRange(1, 10)
         self.tesselation_u_edit.setValue(num_u)
         self.tesselation_u_button = QLineEdit('')
-        self.tesselation_u_edit.set_forward_connection(self.tesselation_u_button)
+
+        def int_func(val):
+            return str(int(val))
+        self.tesselation_u_edit.set_forward_connection(self.tesselation_u_button, int_func)
 
         self.tesselation_w = QLabel("Num_W")
         self.tesselation_w_edit = QJumpSlider(QtCore.Qt.Horizontal)
@@ -167,52 +169,60 @@ class WingWindow(PyDialog):
 
         self.xloc = QLabel("X Loc")
         self.xloc_edit = QJumpSlider(QtCore.Qt.Horizontal)
+        self.xloc_button = QLineEdit(str(xloc))
+        self.xloc_edit.set_forward_connection(self.xloc_button, float_func)
         #self.xloc_edit.setTickPosition(QSlider.TicksBelow)
         self.xloc_edit.setRange(1, 10)
         self.xloc_edit.setValue(xloc)
-        self.xloc_button = QLineEdit(str(xloc))
 
         self.yloc = QLabel("Y Loc")
         self.yloc_edit = QJumpSlider(QtCore.Qt.Horizontal)
+        self.yloc_button = QLineEdit(str(yloc))
+        self.yloc_edit.set_forward_connection(self.yloc_button, float_func)
         #self.yloc_edit.setTickPosition(QSlider.TicksBelow)
         self.yloc_edit.setRange(1, 10)
         self.yloc_edit.setValue(yloc)
-        self.yloc_button = QLineEdit(str(yloc))
 
         self.zloc = QLabel("Z Loc")
         self.zloc_edit = QJumpSlider(QtCore.Qt.Horizontal)
+        self.zloc_button = QLineEdit(str(zloc))
+        self.zloc_edit.set_forward_connection(self.zloc_button, float_func)
+
         #self.zloc_edit.setTickPosition(QSlider.TicksBelow)
         self.zloc_edit.setRange(1, 10)
         self.zloc_edit.setValue(zloc)
-        self.zloc_button = QLineEdit(str(zloc))
 
         self.xrot = QLabel("X Rot")
         self.xrot_edit = QJumpSlider(QtCore.Qt.Horizontal)
+        self.xrot_button = QLineEdit(str(xrot))
+        self.xrot_edit.set_forward_connection(self.xrot_button, float_func)
         #self.xrot_edit.setTickPosition(QSlider.TicksBelow)
         self.xrot_edit.setRange(1, 10)
         self.xrot_edit.setValue(xrot)
-        self.xrot_button = QLineEdit(str(xrot))
 
         self.yrot = QLabel("Y Rot")
         self.yrot_edit = QJumpSlider(QtCore.Qt.Horizontal)
+        self.yrot_button = QLineEdit(str(yrot))
+        self.yrot_edit.set_forward_connection(self.yrot_button, float_func)
         #self.yrot_edit.setTickPosition(QSlider.TicksBelow)
         self.yrot_edit.setRange(1, 10)
         self.yrot_edit.setValue(yrot)
-        self.yrot_button = QLineEdit(str(yrot))
 
         self.zrot = QLabel("Z Rot")
         self.zrot_edit = QJumpSlider(QtCore.Qt.Horizontal)
+        self.zrot_button = QLineEdit(str(zrot))
+        self.zrot_edit.set_forward_connection(self.zrot_button, float_func)
         #self.zrot_edit.setTickPosition(QSlider.TicksBelow)
         self.zrot_edit.setRange(1, 10)
         self.zrot_edit.setValue(zrot)
-        self.zrot_button = QLineEdit(str(zrot))
 
         self.rot_origin = QLabel("Rot Origin (X)")
         self.rot_origin_edit = QJumpSlider(QtCore.Qt.Horizontal)
+        self.rot_origin_button = QLineEdit(str(rot_origin_angle))
+        self.rot_origin_edit.set_forward_connection(self.rot_origin_button, float_func)
         #self.rot_origin_edit.setTickPosition(QSlider.TicksBelow)
         self.rot_origin_edit.setRange(1, 10)
         self.rot_origin_edit.setValue(rot_origin_angle)
-        self.rot_origin_button = QLineEdit(str(rot_origin_angle))
 
     def create_geom_layout(self):
         group_name_color = QGroupBox('Name and Color')
@@ -347,6 +357,8 @@ class WingWindow(PyDialog):
         self.scale = QLabel('Scale')
         self.scale_edit = QJumpSlider(QtCore.Qt.Horizontal)
         self.scale_button = QLineEdit(str(scale))
+        self.scale_edit.set_forward_connection(self.scale_button, float_func)
+
         self.reset_button = QPushButton('Reset')
         self.accept_button = QPushButton('Accept')
 
@@ -362,15 +374,21 @@ class WingWindow(PyDialog):
         translate = QLabel('Translate:')
         rotate = QLabel('Rotate:')
 
+        fzero_to_100 = lambda x: str(x / 100.)
+
         uvalue = 0.5
         wvalue = 0.6
         uname = QLabel('U:')
         uedit = QJumpSlider(QtCore.Qt.Horizontal)
         ubutton = QLineEdit(str(uvalue))
+        uedit.set_forward_connection(ubutton, fzero_to_100)
+        uedit.setRange(0, 100)
 
         wname = QLabel('W:')
         wedit = QJumpSlider(QtCore.Qt.Horizontal)
         wbutton = QLineEdit(str(wvalue))
+        wedit.set_forward_connection(wbutton, fzero_to_100)
+        wedit.setRange(0, 100)
 
         self.translate_none = QCheckBox('None')
         self.translate_comp = QCheckBox('Comp')
@@ -668,6 +686,10 @@ class WingWindow(PyDialog):
     def on_cancel(self):
         self.out_data['close'] = True
         self.close()
+
+
+def float_func(val):
+    return str(val)
 
 
 def main(): # pragma: no cover
