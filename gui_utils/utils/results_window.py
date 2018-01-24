@@ -2,18 +2,12 @@ from __future__ import print_function
 #import sys
 #from copy import deepcopy
 
-# kills the program when you hit Cntl+C from the command line
-#import signal
-#signal.signal(signal.SIGINT, signal.SIG_DFL)
-
 from qtpy import QtGui
-#from qtpy.QtCore import Qt
 from qtpy.QtWidgets import (
     QWidget, QVBoxLayout, QAbstractItemView,
-    #QPushButton, QApplication,
-    #QComboBox, QLabel, QHBoxLayout, QMessageBox
 )
-from gui_utils.utils.qtreeview2 import QTreeView2
+from gui_utils.utils.qtreeview2 import QTreeView2, RightClickTreeView
+
 
 class ResultsWindow(QWidget):
     """
@@ -26,7 +20,7 @@ class ResultsWindow(QWidget):
         self.data = data
         self.choices = choices
         self.parent = parent
-        self.treeView = QTreeView2(self, self.data, choices)
+        self.treeView = RightClickTreeView(self, self.data, choices)
         self.treeView.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         self.model = QtGui.QStandardItemModel()
@@ -41,6 +35,9 @@ class ResultsWindow(QWidget):
         self.setLayout(layout)
 
     def update_data(self, data):
+        # what I want...
+        #self.treeView.update_data(data)
+
         self.clear_data()
         self.data = data
         try:
@@ -113,3 +110,46 @@ class ResultsWindow(QWidget):
         #        ('B', []),
         #    ]
         #    self.update_data(data)
+
+
+def main():  # pragma: no cover
+    import sys
+
+    # kills the program when you hit Cntl+C from the command line
+    import signal
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+    from qtpy.QtWidgets import QApplication
+    app = QApplication(sys.argv)
+
+    form = [
+        [u'Geometry', None, [
+            [u'NodeID', 0, []],
+            [u'ElementID', 1, []],
+            [u'PropertyID', 2, []],
+            [u'MaterialID', 3, []],
+            [u'E', 4, []],
+            [u'Element Checks', None, [
+                [u'ElementDim', 5, []],
+                [u'Min Edge Length', 6, []],
+                [u'Min Interior Angle', 7, []],
+                [u'Max Interior Angle', 8, []]],
+             ],],
+         ],
+    ]
+    name = 'Model'
+    data = form
+    choices = ['cat?', 'dog?']
+
+    res_widget = ResultsWindow(app, name, data, choices)
+
+    #name = 'name'
+    #res_widget.update_results(form, name)
+
+    res_widget.show()
+    sys.exit(app.exec_())
+
+
+if __name__ == "__main__":  # pragma: no cover
+    main()
+

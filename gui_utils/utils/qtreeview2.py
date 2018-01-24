@@ -8,16 +8,17 @@ from __future__ import print_function
 
 from six import string_types
 
-#from qtpy import QtGui
+from qtpy import QtGui
 from qtpy.QtCore import Qt
-from qtpy.QtWidgets import (
-    QTreeView,
-    #QWidget, QAbstractItemView, QVBoxLayout, QPushButton, QApplication,
-    #QComboBox, QLabel, QHBoxLayout, QMessageBox
-)
+from qtpy.QtWidgets import QTreeView, QMessageBox, QMenu
 
 
 class QTreeView2(QTreeView):
+    """
+    creates a QTreeView with:
+     - a nice-ish way to extract the location in the tree
+     - key press delete support
+    """
     def __init__(self, parent, data, choices):
         self.parent = parent
         self.old_rows = []
@@ -34,13 +35,7 @@ class QTreeView2(QTreeView):
         #return
         key = event.key()
         if key == Qt.Key_Delete:
-            rows = self.find_list_index()
-            self.remove_rows(rows)
-            #self.model().removeRow(row)
-            #self.parent().on_delete(index.row())
-
-            #del self.data[row]
-            #self.model().change_data(self.data)
+            self.on_delete()
         else:
             QTreeView.keyPressEvent(self, event)
 
@@ -121,10 +116,7 @@ class QTreeView2(QTreeView):
                 return
 
             self.cases_deleted.update(set(cases_to_delete))
-            sidebar = self.parent.parent
-            if hasattr(sidebar.parent, 'delete_cases'):
-                gui = sidebar.parent
-                gui.delete_cases(cases_to_delete, ask=False)
+            self.on_delete_parent_cases(cases_to_delete)
 
         # hide the line the user wants to delete
         row = rows[-1]
@@ -132,10 +124,15 @@ class QTreeView2(QTreeView):
         self.setRowHidden(row, indexes[-1].parent(), True)
         self.update()
 
+    def on_delete_parent_cases(self, cases_to_delete):
+        """delete cases from the parent"""
+        sidebar = self.parent.parent
+        if hasattr(sidebar.parent, 'delete_cases'):
+            gui = sidebar.parent
+            gui.delete_cases(cases_to_delete, ask=False)
+
     def find_list_index(self):
-        """
-        trace the tree to find the selected item
-        """
+        """trace the tree to find the selected item"""
         indexes = self.selectedIndexes()
 
         rows = []
@@ -151,10 +148,17 @@ class QTreeView2(QTreeView):
         rows.reverse()
         return rows
 
-    def mousePressEvent(self, position):
+    def mousePressEvent(self, event):
         """called when you click a result"""
-        QTreeView.mousePressEvent(self, position)
+        QTreeView.mousePressEvent(self, event)
+        if event.button() == Qt.LeftButton:
+            self.on_left_mouse_button()
+        elif event.button() == Qt.RightButton:
+            self.on_right_mouse_button()
+        else:
+            print('dunno???')
 
+    def on_left_mouse_button(self):
         # trace the tree to find the selected item
         rows = self.find_list_index()
 
@@ -167,6 +171,19 @@ class QTreeView2(QTreeView):
         else:
             print('valid=%s keys=%s' % (valid, keys))
             #print('choice =', self.choices[keys])
+
+    def on_right_mouse_button(self):
+        pass
+
+    def on_delete(self):
+        """interface for deleting rows"""
+        rows = self.find_list_index()
+        self.remove_rows(rows)
+        #self.model().removeRow(row)
+        #self.parent().on_delete(index.row())
+
+        #del self.data[row]
+        #self.model().change_data(self.data)
 
     def get_row(self):
         """
@@ -210,6 +227,98 @@ class QTreeView2(QTreeView):
     def set_single(self, single):
         self.single = single
         self.old_rows = [0]
+
+
+class RightClickTreeView(QTreeView2):
+    """
+    creates a QTreeView with:
+     - all the features of QTreeView2
+     - a right click context menu with:
+       - Edit - TODO
+       - Cut - TODO
+       - Copy - TODO
+       - Rename - TODO
+       - Delete
+    """
+    def __init__(self, parent, data, choices):
+        QTreeView2.__init__(self, parent, data, choices)
+
+        self.right_click_menu = QMenu()
+        edit = self.right_click_menu.addAction("Edit...")
+        cut = self.right_click_menu.addAction("Cut...")
+        copy = self.right_click_menu.addAction("Copy...")
+        paste = self.right_click_menu.addAction("Paste...")
+        rename = self.right_click_menu.addAction("Rename...")
+        delete = self.right_click_menu.addAction("Delete...")
+
+        edit.triggered.connect(self.on_edit)
+        cut.triggered.connect(self.on_cut)
+        copy.triggered.connect(self.on_copy)
+        paste.triggered.connect(self.on_paste)
+        rename.triggered.connect(self.on_rename)
+        delete.triggered.connect(self.on_delete)
+
+    def on_edit(self):
+        rows = self.find_list_index()
+        print('edit...rows=%s' % rows)
+    def on_cut(self):
+        pass
+    def on_copy(self):
+        pass
+    def on_paste(self):
+        pass
+    def on_rename(self):
+        rows = self.find_list_index()
+        list_data = self.data
+        for row in rows[:-1]:
+            list_datai = list_data[row]
+            list_data = list_datai[2]
+
+        list_datai = list_data[rows[-1]]
+        list_data = list_datai[0]
+        print('list_datai* = ', list_datai)
+        #print('list_data2* = %r' % list_data)
+        list_datai[0] = 'cat'
+        self.parent.update_data(self.data)
+        #self.update()
+
+    #def on_delete(self):
+        #pass
+
+    def on_right_mouse_button(self):
+        self.right_click_menu.popup(QtGui.QCursor.pos())
+
+
+
+def get_many_cases(data):
+    """
+    Get the result case ids that are a subset of the data/form list
+
+    data = [
+        (u'Element Checks', None, [
+            (u'ElementDim', 5, []),
+            (u'Min Edge Length', 6, []),
+            (u'Min Interior Angle', 7, []),
+            (u'Max Interior Angle', 8, [])],
+        ),
+    ]
+    >>> get_many_cases(data)
+    [5, 6, 7, 8]
+
+    >>> data = [(u'Max Interior Angle', 8, [])]
+    [8]
+    """
+    name, case, rows = data
+    if case is None:
+        # remove many results
+        # (Geometry, None, [results...])
+        cases = []
+        for irow, row in enumerate(rows):
+            name, row_id, data2 = row
+            cases += get_many_cases(row)
+    else:
+        cases = [case]
+    return cases
 
 
 #for subcase in subcases:
